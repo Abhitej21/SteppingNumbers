@@ -1,0 +1,46 @@
+class Solution {
+    int mod = (int)(1e9+7);
+    public int find(int index,int tight,int leading,String num,int n,int prev,int[][][][] dp){
+        if(index==n)return 1;
+        if(dp[index][tight][leading][prev+1]!=-1)return dp[index][tight][leading][prev+1];
+        int high = (tight==1)?num.charAt(index)-'0':9;
+        long res = 0;
+        for(int i=0;i<=high;i++){
+            int new_tight = (tight==1&&i==high)?1:0;
+            int new_leading = (leading==1 && i==0)?1:0;
+            if(prev!=-1 && leading!=1){
+                if(Math.abs(prev-i)==1){
+                    res = (res%mod + find(index+1,new_tight,new_leading,num,n,i,dp)%mod)%mod;
+                }
+            }
+            else{
+                res = (res%mod + find(index+1,new_tight,new_leading,num,n,i,dp)%mod)%mod;
+            }
+        }
+        return dp[index][tight][leading][prev+1] = (int)(res%mod);
+
+    }
+    public int countSteppingNumbers(String low, String high) {
+        int l = low.length();
+        int h = high.length();
+        int dp[][][][] = new int[102][2][2][11];
+        for(int[][][] a: dp)for(int[][] b: a)for(int[] c: b)Arrays.fill(c,-1);
+        int mini = find(0,1,1,low,l,-1,dp);
+        for(int[][][] a: dp)for(int[][] b: a)for(int[] c: b)Arrays.fill(c,-1);
+        int maxi = find(0,1,1,high,h,-1,dp);
+        int res = maxi-mini;
+        int check = 0;
+        int f = 0;
+        for(int i=1;i<l;i++){
+            if(Math.abs((low.charAt(i)-'0')-(low.charAt(i-1)-'0'))!=1){
+                f = 1;
+                break;
+            }
+        }
+        if(res<0)res += mod;
+        if(f==0){
+            return (res+1)%mod;
+        }
+        return res%mod;
+    }
+}
